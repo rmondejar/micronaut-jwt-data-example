@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: mn.jwt.data
+---
+testFramework: spock
+sourceLanguage: java
