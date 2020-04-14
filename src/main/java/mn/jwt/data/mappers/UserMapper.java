@@ -1,7 +1,7 @@
-package mn.jwt.data.services;
+package mn.jwt.data.mappers;
 
 import mn.jwt.data.domain.User;
-import mn.jwt.data.dto.UserDto;
+import mn.jwt.data.dtos.UserDto;
 
 import javax.inject.Singleton;
 

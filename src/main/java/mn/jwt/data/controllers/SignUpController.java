@@ -9,7 +9,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 
-import mn.jwt.data.dto.UserDto;
+import mn.jwt.data.dtos.UserDto;
 import mn.jwt.data.services.UserService;
 
 
@@ -17,7 +17,7 @@ import mn.jwt.data.services.UserService;
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class SignUpController {
 
-    final UserService userService;
+    private final UserService userService;
 
     public SignUpController(UserService userService) {
         this.userService = userService;

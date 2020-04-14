@@ -17,7 +17,7 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
 
-import mn.jwt.data.dto.UserDto
+import mn.jwt.data.dtos.UserDto
 
 class SignUpAuthenticationSpec extends Specification {
 

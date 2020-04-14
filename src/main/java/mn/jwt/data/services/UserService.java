@@ -4,14 +4,15 @@ import java.util.Optional;
 import javax.inject.Singleton;
 
 import mn.jwt.data.domain.User;
-import mn.jwt.data.dto.UserDto;
+import mn.jwt.data.dtos.UserDto;
+import mn.jwt.data.mappers.UserMapper;
 import mn.jwt.data.repositories.UserRepository;
 
 @Singleton
 public class UserService {
 
-    final UserRepository usersRepository;
-    final UserMapper userMapper;
+    private final UserRepository usersRepository;
+    private final UserMapper userMapper;
 
     public UserService(UserRepository usersRepository, UserMapper userMapper) {
         this.usersRepository = usersRepository;

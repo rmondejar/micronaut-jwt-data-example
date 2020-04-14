@@ -10,7 +10,7 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.*;
 
 import mn.jwt.data.services.UserService;
-import mn.jwt.data.dto.UserDto;
+import mn.jwt.data.dtos.UserDto;
 
 
 import static io.micronaut.security.authentication.AuthenticationFailureReason.PASSWORD_EXPIRED;
@@ -20,7 +20,7 @@ import static java.util.Collections.singletonList;
 @Singleton
 public class BasicAuthProvider implements AuthenticationProvider {
 
-    final UserService userService;
+    private final UserService userService;
 
     public BasicAuthProvider(UserService userService) {
         this.userService = userService;
