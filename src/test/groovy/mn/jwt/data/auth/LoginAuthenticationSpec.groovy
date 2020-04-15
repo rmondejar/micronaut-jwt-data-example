@@ -1,4 +1,4 @@
-package mn.jwt.data
+package mn.jwt.data.auth
 
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
@@ -91,16 +91,6 @@ class LoginAuthenticationSpec extends Specification {
         JWTParser.parse(rsp.body().accessToken).getJWTClaimsSet().getSubject() == username
         rsp.body().refreshToken
         JWTParser.parse(rsp.body().refreshToken) instanceof SignedJWT
-
-        when:
-        String accessToken = rsp.body().accessToken
-        HttpRequest requestWithAuthorization = HttpRequest.GET('/messages').header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
-        HttpResponse<String> response = client.toBlocking().exchange(requestWithAuthorization, String)
-
-        then:
-        noExceptionThrown()
-        response.status == HttpStatus.OK
-        response.body()
     }
 
     def "Login with a forbidden role obtaining access denied"() {

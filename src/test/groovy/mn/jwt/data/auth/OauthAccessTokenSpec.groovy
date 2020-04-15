@@ -1,4 +1,4 @@
-package mn.jwt.data
+package mn.jwt.data.auth
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpRequest

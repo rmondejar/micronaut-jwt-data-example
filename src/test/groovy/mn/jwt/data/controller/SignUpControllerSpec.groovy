@@ -1,4 +1,4 @@
-package mn.jwt.data
+package mn.jwt.data.controller
 
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
@@ -19,7 +19,7 @@ import spock.lang.Specification
 
 import mn.jwt.data.dtos.UserDto
 
-class SignUpAuthenticationSpec extends Specification {
+class SignUpControllerSpec extends Specification {
 
     @Shared
     @AutoCleanup
