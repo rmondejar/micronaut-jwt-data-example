@@ -2,9 +2,11 @@ package mn.jwt.data.services;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.inject.Singleton;
 
+import mn.jwt.data.domain.Message;
 import mn.jwt.data.dtos.MessageDto;
 import mn.jwt.data.mappers.MessageMapper;
 import mn.jwt.data.repositories.MessageRepository;
@@ -39,5 +41,12 @@ public class MessageService {
         );
 
         return messageDtos;
+    }
+
+    public Optional<MessageDto> create(String content, String username) {
+
+         return userRepository.findByUsername(username).map(user ->
+                                messagesRepository.save(Message.builder().content(content).user(user).build()))
+                                .map(messageMapper::toDto);
     }
 }

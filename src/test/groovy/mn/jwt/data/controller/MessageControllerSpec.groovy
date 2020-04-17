@@ -16,6 +16,8 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
 
+import java.time.LocalDate
+
 class MessageControllerSpec extends Specification {
 
     @Shared
@@ -28,6 +30,9 @@ class MessageControllerSpec extends Specification {
 
     @Shared
     String validToken
+
+    @Shared
+    Integer numMessages = 1
 
 
     def "Login with an existing user correctly"() {
@@ -59,13 +64,54 @@ class MessageControllerSpec extends Specification {
         HttpRequest requestWithAuthorization = HttpRequest.GET('/messages').header(HttpHeaders.AUTHORIZATION, "Bearer $validToken")
         HttpResponse<List<MessageDto>> response = client.toBlocking().exchange(requestWithAuthorization, List)
         List<MessageDto> messages = response.body()
+        numMessages = messages?.size()
 
         then:
         noExceptionThrown()
         response.status == HttpStatus.OK
         messages
+        numMessages == 1
+
         messages.first()
-        messages.first().user
-        messages.first().user.username == username
+        messages.first().username == username
+    }
+
+    def "Create new message from one validate user correctly"() {
+
+        given: 'User data'
+        String username = 'user2'
+        String content = 'test message content'
+
+        when: 'The message post endpoint is called with a valid token'
+        HttpRequest requestWithAuthorization = HttpRequest.POST('/messages', content).header(HttpHeaders.AUTHORIZATION, "Bearer $validToken")
+        HttpResponse<MessageDto> response = client.toBlocking().exchange(requestWithAuthorization, MessageDto)
+
+
+        then: 'The user\'s message is posted correctly'
+        noExceptionThrown()
+        response.status == HttpStatus.CREATED
+        response
+        response.body()
+        response.body().id
+        response.body().content
+        response.body().content == content
+        response.body().creationDate
+        response.body().creationDate == LocalDate.now()
+
+
+        when: 'recover messages of the user again'
+        requestWithAuthorization = HttpRequest.GET('/messages').header(HttpHeaders.AUTHORIZATION, "Bearer $validToken")
+        HttpResponse<List<MessageDto>> response2 = client.toBlocking().exchange(requestWithAuthorization, List)
+        List<MessageDto> messages = response2.body()
+
+        then: 'The user\'s messages is increased and the new message is there'
+        noExceptionThrown()
+        response2.status == HttpStatus.OK
+        messages
+        !messages.empty
+        messages?.size() == numMessages+1
+        messages.last()
+        messages.last().content == content
+        messages.last().username == username
     }
 }
