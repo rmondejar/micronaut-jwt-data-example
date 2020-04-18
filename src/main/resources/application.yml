@@ -2,11 +2,13 @@
 micronaut:
   server:
     port: 8080
-  ssl:
-    enabled: false
-    buildSelfSigned: true
   application:
     name: mn-jwt-data
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
 
 jackson:
   bean-introspection-module: true
@@ -34,6 +36,11 @@ jpa:
 micronaut:
   security:
     enabled: true
+    interceptUrlMap:
+      - pattern: "/swagger/**"
+        httpMethod: GET
+        access:
+          - isAnonymous()
     endpoints:
       login:
         enabled: true
