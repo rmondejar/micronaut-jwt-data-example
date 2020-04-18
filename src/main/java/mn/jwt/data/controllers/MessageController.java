@@ -1,12 +1,13 @@
 package mn.jwt.data.controllers;
 
 import java.util.List;
+import java.security.Principal;
+import javax.annotation.Nullable;
 import io.reactivex.Single;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
@@ -40,27 +41,27 @@ public class MessageController {
 
     @Get
     @Secured({"ADMIN", "VIEW"})
-    public  Single<HttpResponse<List<MessageDto>>> getMessages(@Header String authorization) {
+    public  Single<HttpResponse<List<MessageDto>>> getMessages(@Nullable Principal principal) {
 
         return Single.just(
-                userService.extractAuthUser(authorization).map(user ->
+                userService.findUser(principal.getName()).map(user ->
                         HttpResponse.ok(messageService.findAllByUsername(user.getUsername()))
-                    )
-                    .orElse(HttpResponse.unauthorized())
+                )
+                        .orElse(HttpResponse.unauthorized())
         );
     }
 
     @Post
     @Secured({"ADMIN", "VIEW"})
-    public  Single<HttpResponse<MessageDto>> postMessage(@Header String authorization, @Body String content) {
+    public  Single<HttpResponse<MessageDto>> postMessage(@Nullable Principal principal, @Body String content) {
 
         return Single.just(
-                userService.extractAuthUser(authorization).map(user ->
+                userService.findUser(principal.getName()).map(user ->
                         messageService.create(content, user.getUsername())
                                 .map(message -> HttpResponse.created(message))
                                 .orElse(INSTANCE.status(FORBIDDEN))
                 )
-                .orElse(HttpResponse.unauthorized())
+                        .orElse(HttpResponse.unauthorized())
         );
     }
 }

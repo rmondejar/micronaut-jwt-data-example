@@ -34,19 +34,4 @@ public class UserService {
     public Optional<UserDto> findUser(String username) {
         return usersRepository.findByUsername(username).map(userMapper::toDto);
     }
-
-    public Optional<UserDto> extractAuthUser(String authorization) {
-
-        try {
-
-            SignedJWT jwt = (SignedJWT) JWTParser.parse(authorization.substring(authHeaderLength));
-            String username = jwt.getJWTClaimsSet().getSubject();
-
-            return findUser(username);
-
-        } catch (ParseException e) {
-            log.error(e.getMessage());
-        }
-        return Optional.empty();
-    }
 }

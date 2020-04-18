@@ -9,7 +9,11 @@ import javax.inject.Singleton;
 public class UserMapper {
 
     public User toEntity(UserDto userDto) {
-        return User.builder().username(userDto.getUsername()).password(userDto.getPassword()).role(userDto.getRole()).build();
+        User user = User.builder().username(userDto.getUsername()).password(userDto.getPassword()).role(userDto.getRole()).build();
+        if (user.getRole()==null) {
+            user.setRole(User.DEFAULT_ROLE);
+        }
+        return user;
     }
 
     public UserDto toDto(User user) {
