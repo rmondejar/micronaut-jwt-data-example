@@ -5,3 +5,5 @@ Creating a backend at fast-pace with Micronaut (JPA, JWT)
 
 [Managing JWT Auth with Micronaut v2 (Part 2)](
 https://medium.com/@ruuben/managing-jwt-auth-with-micronaut-v2-part-2-53ed984c48e?sk=60fd17bc4eceeff73835192c3771b586)
+
+[Managing JWT Auth with Micronaut v2 (Part 3)](https://medium.com/@ruuben/managing-jwt-auth-with-micronaut-v2-part-3-5fd265a170b)
