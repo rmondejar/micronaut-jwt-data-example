@@ -1,4 +1,4 @@
-package mn.jwt.data.config;
+package mn.jwt.data.auth;
 
 import java.util.Optional;
 import javax.inject.Singleton;

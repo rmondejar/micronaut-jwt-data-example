@@ -49,6 +49,12 @@ micronaut:
     token:
       jwt:
         enabled: true
+        generator:
+          access-token:
+            expiration: 3600
+          refresh-token:
+            enabled: true
+            secret: "${JWT_GENERATOR_REFRESH_SECRET:eefe82f8-7ca6-11ea-bc55-0242ac130003}"
         signatures:
           secret:
             generator:

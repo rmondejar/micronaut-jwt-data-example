@@ -80,7 +80,7 @@ class LoginAuthenticationSpec extends Specification {
 
         when: 'Login endpoint is called with valid credentials'
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password)
-        HttpRequest request = HttpRequest.POST('/login', credentials) // <5>
+        HttpRequest request = HttpRequest.POST('/login', credentials)
         HttpResponse<BearerAccessRefreshToken> rsp = client.toBlocking().exchange(request, BearerAccessRefreshToken)
 
         then: 'JWT token is returned'
@@ -90,7 +90,6 @@ class LoginAuthenticationSpec extends Specification {
         JWTParser.parse(rsp.body().accessToken) instanceof SignedJWT
         JWTParser.parse(rsp.body().accessToken).getJWTClaimsSet().getSubject() == username
         rsp.body().refreshToken
-        JWTParser.parse(rsp.body().refreshToken) instanceof SignedJWT
     }
 
     def "Login with a forbidden role obtaining access denied"() {

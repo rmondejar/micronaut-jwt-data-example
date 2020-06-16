@@ -1,10 +1,13 @@
 package mn.jwt.data.auth
 
+import com.nimbusds.jwt.JWTParser
+import com.nimbusds.jwt.SignedJWT
 import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
@@ -24,31 +27,57 @@ class OauthAccessTokenSpec extends Specification {
     @AutoCleanup
     RxHttpClient client = embeddedServer.applicationContext.createBean(RxHttpClient, embeddedServer.getURL())
 
-    def "Verify JWT access token refresh works"() {
+    def "Verify tokens are working"() {
 
         given: 'User data'
         String username = 'user1'
         String password = 'password1'
 
-        when: 'login endpoint is called with valid credentials'
+        when: 'Login endpoint is called with valid credentials'
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password)
         HttpRequest request = HttpRequest.POST('/login', credentials)
         HttpResponse<BearerAccessRefreshToken> rsp = client.toBlocking().exchange(request, BearerAccessRefreshToken)
+        String authToken = rsp?.body()?.accessToken
+        String refreshToken = rsp?.body()?.refreshToken
 
-        then: 'the endpoint can be accessed'
+        then: 'JWT token is returned'
+        rsp
         rsp.status == HttpStatus.OK
+        rsp.body()
+        rsp.body().username == username
+        authToken
+        JWTParser.parse(authToken) instanceof SignedJWT
+        JWTParser.parse(authToken).getJWTClaimsSet().getSubject() == username
+        refreshToken
 
         when:
-        sleep(1_000) // sleep for one second to give time for the issued at `iat` Claim to change
-        String refreshToken = rsp.body().refreshToken
-        String accessToken = rsp.body().accessToken
-
         HttpResponse<AccessRefreshToken> response = client.toBlocking().exchange(HttpRequest.POST('/oauth/access_token',
                 new TokenRefreshRequest("refresh_token", refreshToken)), AccessRefreshToken)
 
         then:
         response.status == HttpStatus.OK
         response.body().accessToken
-        response.body().accessToken != accessToken
+        response.body().refreshToken == refreshToken
+    }
+
+    def "Trying to refresh with wrong tokens returning different errors"() {
+
+        when: "invalid non base64 token"
+        HttpResponse<AccessRefreshToken> response = client.toBlocking().exchange(HttpRequest.POST('/oauth/access_token',
+                new TokenRefreshRequest("refresh_token", "invalidTokenNoUserLinkedToThis")), AccessRefreshToken)
+
+        then: "bad request"
+        !response
+        HttpClientResponseException e = thrown(HttpClientResponseException)
+        e.status == HttpStatus.INTERNAL_SERVER_ERROR
+
+        when: "invalid non base64 token"
+        response = client.toBlocking().exchange(HttpRequest.POST('/oauth/access_token',
+                new TokenRefreshRequest("refresh_token", "Q3SATXAeo5mykNFH9Z6otzQivbTguv+ev6X3wxmQWC0GSv9liH3lEQ==")), AccessRefreshToken)
+
+        then: "not found"
+        !response
+        e = thrown(HttpClientResponseException)
+        e.status == HttpStatus.INTERNAL_SERVER_ERROR
     }
 }

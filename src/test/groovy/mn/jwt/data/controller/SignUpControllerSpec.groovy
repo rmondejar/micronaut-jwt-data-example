@@ -78,7 +78,6 @@ class SignUpControllerSpec extends Specification {
         rsp.body().accessToken
         JWTParser.parse(rsp.body().accessToken) instanceof SignedJWT
         rsp.body().refreshToken
-        JWTParser.parse(rsp.body().refreshToken) instanceof SignedJWT
     }
 
 }

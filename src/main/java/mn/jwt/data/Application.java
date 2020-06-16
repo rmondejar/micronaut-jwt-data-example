@@ -8,7 +8,7 @@ import io.micronaut.runtime.Micronaut;
 @OpenAPIDefinition(
         info = @Info(
                 title = "mn-jwt-jpa",
-                version = "0.3"
+                version = "0.4"
         )
 )
 public class Application {

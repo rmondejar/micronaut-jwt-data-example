@@ -15,19 +15,19 @@ import mn.jwt.data.repositories.UserRepository;
 @Singleton
 public class MessageService {
 
-    private final MessageRepository messagesRepository;
+    private final MessageRepository messageRepository;
     private final MessageMapper messageMapper;
     private final UserRepository userRepository;
 
     public MessageService(MessageRepository messagesRepository, MessageMapper messageMapper, UserRepository userRepository) {
-        this.messagesRepository = messagesRepository;
+        this.messageRepository = messagesRepository;
         this.messageMapper = messageMapper;
         this.userRepository = userRepository;
     }
 
     public List<MessageDto> findAll() {
         List<MessageDto> messageDtos = new ArrayList<>();
-        messagesRepository.findAll().forEach(message -> messageDtos.add(messageMapper.toDto(message)));
+        messageRepository.findAll().forEach(message -> messageDtos.add(messageMapper.toDto(message)));
         return messageDtos;
     }
 
@@ -36,7 +36,7 @@ public class MessageService {
         List<MessageDto> messageDtos = new ArrayList<>();
 
         userRepository.findByUsername(username).ifPresent(user ->
-                messagesRepository.findAllByUser(user).forEach(message ->
+                messageRepository.findAllByUser(user).forEach(message ->
                         messageDtos.add(messageMapper.toDto(message)))
         );
 
@@ -46,7 +46,7 @@ public class MessageService {
     public Optional<MessageDto> create(String content, String username) {
 
          return userRepository.findByUsername(username).map(user ->
-                                messagesRepository.save(Message.builder().content(content).user(user).build()))
+                                messageRepository.save(Message.builder().content(content).user(user).build()))
                                 .map(messageMapper::toDto);
     }
 }
