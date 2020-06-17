@@ -90,6 +90,7 @@ class LoginAuthenticationSpec extends Specification {
         JWTParser.parse(rsp.body().accessToken) instanceof SignedJWT
         JWTParser.parse(rsp.body().accessToken).getJWTClaimsSet().getSubject() == username
         rsp.body().refreshToken
+        JWTParser.parse(rsp.body().refreshToken) instanceof SignedJWT
     }
 
     def "Login with a forbidden role obtaining access denied"() {
@@ -108,6 +109,7 @@ class LoginAuthenticationSpec extends Specification {
         rsp.body().username == username
         rsp.body().accessToken
         JWTParser.parse(rsp.body().accessToken) instanceof SignedJWT
+        JWTParser.parse(rsp.body().refreshToken) instanceof SignedJWT
 
         when:
         String accessToken = rsp.body().accessToken

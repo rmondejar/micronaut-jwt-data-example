@@ -1,8 +1,8 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.2.0"
-    id "application"
+    id "com.diffplug.eclipse.apt" version "3.22.0"
     id "groovy"
-    id "net.ltgt.apt-eclipse" version "0.21"
+    id "com.github.johnrengelman.shadow" version "6.0.0"
+    id "application"
     id "com.google.cloud.tools.jib" version "2.1.0"
 }
 
@@ -11,11 +11,12 @@ group "mn.jwt.data"
 
 repositories {
     mavenCentral()
-    maven { url "https://jcenter.bintray.com" }
+    jcenter()
 }
 
 configurations {
-    developmentOnly 
+    // for dependencies that are needed for development only
+    developmentOnly
 }
 
 ext {
@@ -63,6 +64,28 @@ test.classpath += configurations.developmentOnly
 
 mainClassName = "mn.jwt.data.Application"
 
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion('11')
+    targetCompatibility = JavaVersion.toVersion('11')
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll([
+        '-parameters',
+        // enables incremental compilation
+        '-Amicronaut.processing.incremental=true',
+        '-Amicronaut.processing.annotations=mn.jwt.data.*',
+        "-Amicronaut.processing.group=$project.group",
+        "-Amicronaut.processing.module=$project.name",
+    ])
+}
+
 shadowJar {
     mergeServiceFiles()
 }
@@ -70,10 +93,13 @@ shadowJar {
 tasks.withType(JavaExec) {
     classpath += configurations.developmentOnly
     jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
-}
-tasks.withType(JavaCompile){
-    options.encoding = "UTF-8"
-    options.compilerArgs.add('-parameters')
+    if (gradle.startParameter.continuous) {
+        systemProperties(
+            'micronaut.io.watch.restart':'true',
+            'micronaut.io.watch.enabled':'true',
+            "micronaut.io.watch.paths":"src/main"
+        )
+    }
 }
 
 jib {

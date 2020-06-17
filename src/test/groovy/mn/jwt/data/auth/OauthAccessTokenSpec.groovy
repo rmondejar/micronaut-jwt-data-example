@@ -62,22 +62,22 @@ class OauthAccessTokenSpec extends Specification {
 
     def "Trying to refresh with wrong tokens returning different errors"() {
 
-        when: "invalid non base64 token"
+        when: "using a malformed token"
         HttpResponse<AccessRefreshToken> response = client.toBlocking().exchange(HttpRequest.POST('/oauth/access_token',
-                new TokenRefreshRequest("refresh_token", "invalidTokenNoUserLinkedToThis")), AccessRefreshToken)
+                new TokenRefreshRequest("refresh_token", "notJwtTokenLikeAsItIsExpected")), AccessRefreshToken)
 
-        then: "bad request"
+        then: "bad request response"
         !response
         HttpClientResponseException e = thrown(HttpClientResponseException)
-        e.status == HttpStatus.INTERNAL_SERVER_ERROR
+        e.status == HttpStatus.BAD_REQUEST
 
-        when: "invalid non base64 token"
+        when: "using a non existing token"
         response = client.toBlocking().exchange(HttpRequest.POST('/oauth/access_token',
-                new TokenRefreshRequest("refresh_token", "Q3SATXAeo5mykNFH9Z6otzQivbTguv+ev6X3wxmQWC0GSv9liH3lEQ==")), AccessRefreshToken)
+                new TokenRefreshRequest("refresh_token", "eyJhbGciOiJIUzI1NiJ9.MzZjZWQwNzktNmIxNi00OTNlLTg1ZjEtM2RjZTA4NGJiNWY2._grvHNUjh71cJf_e2VWnAGEUJEyJ61aT-1_vcWpk9lc")), AccessRefreshToken)
 
-        then: "not found"
+        then: "forbidden response"
         !response
         e = thrown(HttpClientResponseException)
-        e.status == HttpStatus.INTERNAL_SERVER_ERROR
+        e.status == HttpStatus.FORBIDDEN
     }
 }
